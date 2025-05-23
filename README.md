@@ -75,4 +75,4 @@ Never expose `.env`, secrets, or real OTPs in public repositories. Always use en
 
 ---
 
-Made with ❤️ by [YourName]
+Made with ❤️ by [Mohammad]

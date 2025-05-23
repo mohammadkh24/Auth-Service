@@ -29,7 +29,7 @@ A simple and secure authentication service using OTP & JWT. Users can log in via
 ## ⚙️ Setup
 
 ```bash
-git clone https://github.com/your-username/Auth-Service.git
+git clone https://github.com/mohammadkh24/Auth-Service.git
 cd Auth-Service
 npm install
 ```

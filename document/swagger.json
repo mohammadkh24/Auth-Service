@@ -1,142 +1,316 @@
 {
-  "openapi": "3.0.0",
-  "info": {
-    "title": "Auth API",
-    "version": "1.0.0",
-    "description": "OTP-based authentication API with JWT"
-  },
-  "servers": [
-    {
-      "url": "http://localhost:3000/"
-    }
-  ],
-  "tags": [
-    {
-      "name": "Auth",
-      "description": "All routes about user auth"
+    "openapi": "3.0.0",
+    "info": {
+      "title": "Auth API",
+      "version": "1.0.0",
+      "description": "OTP-based authentication API with JWT"
     },
-    {
-      "name": "Users",
-      "description": "All routes about users"
-    }
-  ],
-  "paths": {
-    "/auth/send": {
-      "post": {
-        "tags": ["Auth"],
-        "summary": "Send OTP",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "phone": {
-                    "type": "string",
-                    "example": "09123456789"
-                  }
-                },
-                "required": ["phone"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OTP sent successfully"
-          },
-          "400": {
-            "description": "Phone is banned"
-          }
-        }
+    "servers": [
+      {
+        "url": "http://localhost:3000/"
       }
-    },
-    "/auth/verify": {
-      "post": {
-        "tags": ["Auth"],
-        "summary": "Verify OTP and Login/Register",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "phone": {
-                    "type": "string",
-                    "example": "09123456789"
+    ],
+    "tags": [
+      {
+        "name": "Auth",
+        "description": "All routes about user auth"
+      },
+      {
+        "name": "Users",
+        "description": "All routes about users"
+      }
+    ],
+    "paths": {
+      "/auth/send": {
+        "post": {
+          "tags": ["Auth"],
+          "summary": "Send OTP",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "phone": {
+                      "type": "string",
+                      "example": "09123456789"
+                    }
                   },
-                  "otp": {
-                    "type": "string",
-                    "example": "1234"
-                  }
-                },
-                "required": ["phone", "otp"]
+                  "required": ["phone"]
+                }
               }
             }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Login success"
           },
-          "201": {
-            "description": "User registered and logged in"
-          },
-          "400": {
-            "description": "Wrong or expired OTP"
+          "responses": {
+            "200": {
+              "description": "OTP sent successfully"
+            },
+            "400": {
+              "description": "Phone is banned"
+            }
           }
         }
-      }
-    },
-    "/auth/me": {
-      "get": {
-        "tags": ["Auth"],
-        "summary": "Get current user profile",
-        "security": [
-          {
-            "bearerAuth": []
+      },
+      "/auth/verify": {
+        "post": {
+          "tags": ["Auth"],
+          "summary": "Verify OTP and Login/Register",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "phone": {
+                      "type": "string",
+                      "example": "09123456789"
+                    },
+                    "otp": {
+                      "type": "string",
+                      "example": "1234"
+                    }
+                  },
+                  "required": ["phone", "otp"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Login success"
+            },
+            "201": {
+              "description": "User registered and logged in"
+            },
+            "400": {
+              "description": "Wrong or expired OTP"
+            }
           }
-        ],
-        "responses": {
+        }
+      },
+      "/auth/me": {
+        "get": {
+          "tags": ["Auth"],
+          "summary": "Get current user profile",
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "responses": {
             "200": {
               "description": "Current user info",
               "content": {
                 "application/json": {
                   "schema": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized"
+            }
+          }
+        }
+      },
+      "/users": {
+        "get": {
+          "tags": ["Users"],
+          "summary": "Get all users (admin only)",
+          "security": [{ "bearerAuth": [] }],
+          "parameters": [
+            {
+              "name": "page",
+              "in": "query",
+              "schema": { "type": "integer", "default": 1 }
+            },
+            {
+              "name": "limit",
+              "in": "query",
+              "schema": { "type": "integer", "default": 10 }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "List of users with pagination",
+              "content": {
+                "application/json": {
+                  "schema": {
                     "type": "object",
                     "properties": {
-                      "_id": { "type": "string", "example": "6830965c02af3fb62030103d" },
-                      "phone": { "type": "string", "example": "09963381210" },
-                      "username": { "type": "string", "example": "09963381210" },
-                      "roles": {
+                      "users": {
                         "type": "array",
-                        "items": { "type": "string" },
-                        "example": ["ADMIN"]
+                        "items": { "$ref": "#/components/schemas/User" }
                       },
-                      "createdAt": { "type": "string", "format": "date-time", "example": "2025-05-23T15:38:04.352Z" },
-                      "updatedAt": { "type": "string", "format": "date-time", "example": "2025-05-23T15:38:04.352Z" },
-                      "__v": { "type": "integer", "example": 0 }
+                      "pagination": {
+                        "type": "object",
+                        "properties": {
+                          "total": { "type": "integer", "example": 100 },
+                          "currentPage": { "type": "integer", "example": 1 },
+                          "totalPages": { "type": "integer", "example": 10 },
+                          "entity": { "type": "string", "example": "Users" }
+                        }
+                      }
                     }
                   }
                 }
               }
             },
-          "401": {
-            "description": "Unauthorized"
+            "401": { "description": "Unauthorized" },
+            "403": { "description": "Forbidden" }
+          }
+        }
+      },
+      "/users/{userId}": {
+        "delete": {
+          "tags": ["Users"],
+          "summary": "Remove a user (admin only)",
+          "security": [{ "bearerAuth": [] }],
+          "parameters": [
+            {
+              "name": "userId",
+              "in": "path",
+              "required": true,
+              "schema": { "type": "string" }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "User removed",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": { "type": "string" },
+                      "user": { "$ref": "#/components/schemas/User" }
+                    }
+                  }
+                }
+              }
+            },
+            "400": { "description": "You can't remove this user" },
+            "404": { "description": "User not found" }
+          }
+        }
+      },
+      "/users/ban/{userId}": {
+        "post": {
+          "tags": ["Users"],
+          "summary": "Ban a user (admin only)",
+          "security": [{ "bearerAuth": [] }],
+          "parameters": [
+            {
+              "name": "userId",
+              "in": "path",
+              "required": true,
+              "schema": { "type": "string" }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "User banned successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": { "type": "string" },
+                      "user": { "$ref": "#/components/schemas/User" }
+                    }
+                  }
+                }
+              }
+            },
+            "400": { "description": "Can't ban admin user" },
+            "404": { "description": "User not found" }
+          }
+        }
+      },
+      "/users/unBan/{phone}": {
+        "delete": {
+          "tags": ["Users"],
+          "summary": "Unban a user by phone (admin only)",
+          "security": [{ "bearerAuth": [] }],
+          "parameters": [
+            {
+              "name": "phone",
+              "in": "path",
+              "required": true,
+              "schema": { "type": "string" }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "User unbanned successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "example": "User unBanned successfully"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "404": { "description": "User not found" }
+          }
+        }
+      }
+    },
+    "components": {
+      "securitySchemes": {
+        "bearerAuth": {
+          "type": "http",
+          "scheme": "bearer",
+          "bearerFormat": "JWT"
+        }
+      },
+      "schemas": {
+        "User": {
+          "type": "object",
+          "properties": {
+            "_id": {
+              "type": "string",
+              "example": "6830965c02af3fb62030103d"
+            },
+            "phone": {
+              "type": "string",
+              "example": "09963381210"
+            },
+            "username": {
+              "type": "string",
+              "example": "09963381210"
+            },
+            "roles": {
+              "type": "array",
+              "items": { "type": "string" },
+              "example": ["ADMIN"]
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2025-05-23T15:38:04.352Z"
+            },
+            "updatedAt": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2025-05-23T15:38:04.352Z"
+            },
+            "__v": {
+              "type": "integer",
+              "example": 0
+            }
           }
         }
       }
     }
-  },
-  "components": {
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
-      }
-    }
   }
-}
+  

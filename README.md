@@ -55,7 +55,7 @@ NODE_ENV= development
 npm run dev
 ```
 
-Visit Swagger docs at: [http://localhost:3000/document](http://localhost:3000/document)
+Visit Swagger docs at: [https://auth-service-yfvp.onrender.com/document/](https://auth-service-yfvp.onrender.com/document/)
 
 ## 🔐 Endpoints Overview
 

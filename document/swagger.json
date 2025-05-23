@@ -1,14 +1,142 @@
 {
-    "openapi": "3.1.0",
-    "info": {
-      "title": "Auth-Service | Document",
-      "description": "Authenticate service",
-      "version": "1.0.0"
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Auth API",
+    "version": "1.0.0",
+    "description": "OTP-based authentication API with JWT"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "All routes about user auth"
     },
-
-    "servers": [
-        {
-          "url": "http://localhost:3000"
+    {
+      "name": "Users",
+      "description": "All routes about users"
+    }
+  ],
+  "paths": {
+    "/auth/send": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Send OTP",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "phone": {
+                    "type": "string",
+                    "example": "09123456789"
+                  }
+                },
+                "required": ["phone"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OTP sent successfully"
+          },
+          "400": {
+            "description": "Phone is banned"
+          }
         }
-      ]
+      }
+    },
+    "/auth/verify": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Verify OTP and Login/Register",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "phone": {
+                    "type": "string",
+                    "example": "09123456789"
+                  },
+                  "otp": {
+                    "type": "string",
+                    "example": "1234"
+                  }
+                },
+                "required": ["phone", "otp"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login success"
+          },
+          "201": {
+            "description": "User registered and logged in"
+          },
+          "400": {
+            "description": "Wrong or expired OTP"
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Get current user profile",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+            "200": {
+              "description": "Current user info",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "_id": { "type": "string", "example": "6830965c02af3fb62030103d" },
+                      "phone": { "type": "string", "example": "09963381210" },
+                      "username": { "type": "string", "example": "09963381210" },
+                      "roles": {
+                        "type": "array",
+                        "items": { "type": "string" },
+                        "example": ["ADMIN"]
+                      },
+                      "createdAt": { "type": "string", "format": "date-time", "example": "2025-05-23T15:38:04.352Z" },
+                      "updatedAt": { "type": "string", "format": "date-time", "example": "2025-05-23T15:38:04.352Z" },
+                      "__v": { "type": "integer", "example": 0 }
+                    }
+                  }
+                }
+              }
+            },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
 }

@@ -1,5 +1,6 @@
 const express = require("express");
 const docRoutes = require("./document/swagger.routes");
+const authRoutes = require("./routes/auth")
 
 const app = express();
 
@@ -9,6 +10,7 @@ app.use(express.json({ limit: "30mb" }));
 
 // Routes
 app.use("/document" , docRoutes)
+app.use("/auth" , authRoutes)
 
 // Not-Found Page
 app.use((req,res) => {

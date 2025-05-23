@@ -88,7 +88,7 @@ exports.send = async (req, res, next) => {
 
 exports.verify = async (req, res, next) => {
   try {
-    const { phone, otp, isSeller } = req.body;
+    const { phone, otp } = req.body;
 
     const savedOtp = await redis.get(getOtpRedisPattern(phone));
 
@@ -128,17 +128,17 @@ exports.verify = async (req, res, next) => {
     const user = await User.create({
       phone,
       username: phone,
-      roles: isFirstUser ? ["ADMIN"] : isSeller ? ["USER", "SELLER"] : ["USER"],
+      roles: isFirstUser ? ["ADMIN"] : ["USER"],
     });
 
-  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: "30d",
     });
 
     return res.status(201).json({
       message: "User registed successfully :))",
       user,
-      token
+      token,
     });
   } catch (err) {
     next(err);

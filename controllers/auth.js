@@ -79,7 +79,6 @@ exports.send = async (req, res, next) => {
 
     return res.status(200).json({
       message: "Otp sent successfully",
-      otp,
     });
   } catch (err) {
     next(err);
